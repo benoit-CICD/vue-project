@@ -31,7 +31,7 @@
         <li>{{ person.age }}</li>
         
     </ul>
-    <button @click.prevent="randomAge">Changer age</button>
+    <button @click.prevent="randomAge">Changer âge</button>
     
 </template>
 
