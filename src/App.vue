@@ -1,100 +1,83 @@
 <template>
-    <h1>Bonjour</h1>
-    <p>Compteur : {{ count }}</p>
-<!--     <p :class="{active: count > 5}"  v-bind:id="`p-${count}`">Compteur : {{ count }} </p> -->
-<!--     <p :style="{color: count > 5 ? 'red' : 'green'}" v-bind:id="`p-${count}`">Compteur : {{ count }} </p> -->
-<!--     <div v-if="count >= 5">Bravo vous avez cliqué plus de 5 fois</div>
-    <div v-else> Vous avez cliqué moins de 5 fois</div> -->
-    <button v-on:click="increment">Incrémenter</button>
-    <button @click="decrement">Décrémenter</button>
-    <button @click="sortMovies">Réorganiser</button>
-
-    <form action="" @submit.prevent="addMovie">
-        <input type="text" placeholder="Nouveau film..." v-model="movieName"> 
-        <button>
-            Ajouter
-        </button>
-    </form>
-    <ul>
-        <li 
-            v-for="movie in movies"
-            :key="movie"
-        >
-            {{ movie }} <button @click="deleteMovie(movie)">Supprimer</button>
+    <div class="list-container">
+      <template v-for="liste in filterTodo" :key="liste.id">
+        <li class="list-item">
+        <span :class="liste.done ? 'active' : ''">{{ liste.title }}</span>
+          <input type="checkbox" v-model="liste.done" />
+         <!--  <label>{{ liste.done ? 'Fait' : 'À faire' }}</label> -->
         </li>
-    </ul>
-<!--     <div v-text="firstname"></div> -->
-    <br><br>
-    <ul>
-        <li>{{ person.firstname }}</li>
-        <li>{{ person.lastname }}</li>
-        <li>{{ person.age }}</li>
-        
-    </ul>
-    <button @click.prevent="randomAge">Changer age</button>
-    
-</template>
+      </template>
+    </div>
+  
+    <div class="ajout-liste">
+      <input type="text" v-model="newTask" placeholder="Ajouter Tâche" />
+      <button @click="ajout()">+</button>
+    </div>
 
-<script setup>
+    <div class="cacher-liste">
+      <button @click="cacher = !cacher"> {{ labelFilter }}</button>
+    </div>
+  </template>
+  
+  <script setup>
+  import { ref, computed } from 'vue'
+  
+  const listes = ref([
+    { id: 1, title: 'Installation', done: false },
+    { id: 2, title: 'Mise en test', done: false },
+    { id: 3, title: 'Déploiement', done: false }
+  ])
 
-import {ref} from 'vue'
-    const count = ref(0)
+  const filterTodo  = computed(()=> {
+    return cacher.value ? listes.value : listes.value.filter((liste) => !liste.done)
+  })
+  
+  const newTask = ref('');
 
-    const movies = ref([
-        'Rush',
-        'The Fall Guy',
-        'Les Affranchis'
-    ])
-
-    const sortMovies = () => {
-        movies.value.sort((a,b) => a > b ? 1 : -1)
+  const cacher = ref(true);
+  const labelFilter = computed(() => {
+    return cacher.value ? "Caché complété" : "Afficher Toutes";
+  })
+  
+  const ajout = () => {
+    if (newTask.value.trim()) {
+      listes.value.push({
+        id: listes.value.length + 1,
+        title: newTask.value,
+        done: false
+      })
+      newTask.value = ''
     }
+  }
+  </script>
+  
+  <style scoped>
 
-    const deleteMovie = (movie) => {
-        movies.value = movies.value.filter(m => m !== movie)
-    }
+  .list-container {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+  }
+  
+  .list-item {
+    margin: 8px 0;
+    padding: 10px;
+    background-color: #fff;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    list-style-type: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
 
-    const movieName = ref('')
-
-    const addMovie = () => {
-        movies.value.push(movieName.value)
-        movieName.value = ''
-    }
-
-    const firstname = '<span>DEMO</span>'
-    const increment = (event) => {
-        console.log(count, count.value)
-        count.value++
-    }
-
-    const person = ref({
-        firstname: 'John',
-        lastname: 'Doe',
-        age: 20
-    })
-
-    const randomAge = () => {
-            person.value.age =  Math.round(Math.random() * 100)
-        
-    }
+  .active {
+    text-decoration: line-through;
+  }
 
 
-    const decrement  = () => {
-        count.value--
-    }
-
-/*     setInterval(()=>  {
-        count.value++
-    }, 1000);
- */
-</script>
-
-<style>
-h1 {
-    color: violet;
-}
-
-.active {
-    color: red;
-}
-</style>
+  </style>
+  
